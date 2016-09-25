@@ -5,7 +5,7 @@
 // and return the result.
 // Daniel Valvano
 // August 6, 2015
-#include <stdint.h>
+
 /* This example accompanies the book
    "Embedded Systems: Real Time Interfacing to Arm Cortex M Microcontrollers",
    ISBN: 978-1463590154, Jonathan Valvano, copyright (c) 2015
@@ -55,7 +55,7 @@
 // SS3 triggering event: software trigger
 // SS3 1st sample source: Ain9 (PE4)
 // SS3 interrupts: enabled but not promoted to controller
-void ADC0_InitSWTriggerSeq3_Ch9(void);
+void ADC0_InitSWTriggerSeq1_Ch9(void);
 
 // This initialization function sets up the ADC according to the
 // following parameters.  Any parameters not explicitly listed
@@ -68,7 +68,7 @@ void ADC0_InitSWTriggerSeq3_Ch9(void);
 // SS3 triggering event: software trigger
 // SS3 1st sample source: programmable using variable 'channelNum' [0:7]
 // SS3 interrupts: enabled but not promoted to controller
-void ADC0_InitSWTriggerSeq3(uint32_t channelNum);
+void ADC0_InitSWTriggerSeq1(uint32_t channelNum);
 
 // This initialization function sets up the ADC according to the
 // following parameters.  Any parameters not explicitly listed
@@ -81,10 +81,10 @@ void ADC0_InitSWTriggerSeq3(uint32_t channelNum);
 // SS3 triggering event: always trigger
 // SS3 1st sample source: programmable using variable 'channelNum' [0:11]
 // SS3 interrupts: enabled but not promoted to controller
-void ADC0_InitAllTriggerSeq3(uint32_t channelNum);
+void ADC0_InitAllTriggerSeq1(uint32_t channelNum);
 
 //------------ADC0_InSeq3------------
 // Busy-wait Analog to digital conversion
 // Input: none
 // Output: 12-bit result of ADC conversion
-uint32_t ADC0_InSeq3(void);
+uint32_t ADC0_InSeq1(void);
