@@ -112,6 +112,12 @@ void UART_Init(void){
   UARTStdioConfig(0,BAUD_RATE,50000000);
 }
 
+
+#define REQUEST "GET /data/2.5/weather?q=78731,us&APPID=e8d5eb59bc5c06cfefdf40bc624d280b&units=imperial HTTP/1.1\r\nUser-Agent: Keil\r\nHost:api.openweathermap.org\r\nAccept: */*\r\n\r\n"
+
+
+
+
 // 1) go to http://openweathermap.org/appid#use 
 // 2) Register on the Sign up page
 // 3) get an API key (APPID) replace the 1234567890abcdef1234567890abcdef with your APPID
@@ -121,61 +127,17 @@ int main(void){int32_t retVal;  SlSecParams_t secParams;
   //UART_Init();      // Send data to PC, 115200 bps
 	ST7735_InitR(INITR_REDTAB);
   LED_Init();       // initialize LaunchPad I/O 
+	ADC0_InitSWTriggerSeq1_Ch9(); 
 	
-	 ST7735_OutString("Weather App\n");
-	
+	ST7735_OutString("Weather App\n");
 	getConnected(SSID_NAME, SEC_TYPE, PASSKEY);
   
-	ADC0_InitSWTriggerSeq1_Ch9(); 
- /* while(1){
-    strcpy(HostName,"api.openweathermap.org");
-    retVal = sl_NetAppDnsGetHostByName(HostName,
-             strlen(HostName),&DestinationIP, SL_AF_INET);
-    if(retVal == 0){
-      Addr.sin_family = SL_AF_INET;
-      Addr.sin_port = sl_Htons(80);
-      Addr.sin_addr.s_addr = sl_Htonl(DestinationIP);// IP to big endian 
-      ASize = sizeof(SlSockAddrIn_t);
-      SockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
-      if( SockID >= 0 ){
-        retVal = sl_Connect(SockID, ( SlSockAddr_t *)&Addr, ASize);
-      }
-      if((SockID >= 0)&&(retVal >= 0)){
-        strcpy(SendBuff,REQUEST); 
-        sl_Send(SockID, SendBuff, strlen(SendBuff), 0);// Send the HTTP GET 
-        sl_Recv(SockID, Recvbuff, MAX_RECV_BUFF_SIZE, 0);// Receive response 
-        sl_Close(SockID);
-        LED_GreenOn();
-				ST7735_SetCursor(0,7);
-				
-				packetParse(Recvbuff);
-//				ST7735_OutString(Recvbuff);
-				ST7735_OutString("\n");
-				ST7735_sDecOut3(ADC0_InSeq1()*10000/1241);
-				ST7735_OutString(" Volts");
-				
-				
- //       UARTprintf("\r\n\r\n");
- //       UARTprintf(Recvbuff);  UARTprintf("\r\n");
-      }
-    }
+  while(1){
+    sendRequest(REQUEST);
     while(Board_Input()==0){}; // wait for touch
     LED_GreenOff();
-  }*/
+  }
 }
 
-/*!
-    \brief This function puts the device in its default state. It:
-           - Set the mode to STATION
-           - Configures connection policy to Auto and AutoSmartConfig
-           - Deletes all the stored profiles
-           - Enables DHCP
-           - Disables Scan policy
-           - Sets Tx power to maximum
-           - Sets power policy to normal
-           - Unregister mDNS services
 
-    \param[in]      none
-
-    \return         On success, zero is returned. On error, negative is returned
-*/
+           

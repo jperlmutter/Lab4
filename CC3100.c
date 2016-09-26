@@ -103,14 +103,12 @@ void Crash(uint32_t time){
  */
 // 1) change Austin Texas to your city
 // 2) you can change metric to imperial if you want temperature in F
-#define REQUEST "GET /data/2.5/weather?q=78731,us&APPID=e8d5eb59bc5c06cfefdf40bc624d280b&units=imperial HTTP/1.1\r\nUser-Agent: Keil\r\nHost:api.openweathermap.org\r\nAccept: */*\r\n\r\n"
-#define REQUESTPIC "GET /data/2.5/weather?q=78731,us&APPID=e8d5eb59bc5c06cfefdf40bc624d280b&units=imperial HTTP/1.1\r\nUser-Agent: Keil\r\nHost:api.openweathermap.org\r\nAccept: */*\r\n\r\n"
 
 
 char temperature[7];
 char tempnum[6];
 
-
+#define REQUESTPIC "GET /data/2.5/weather?q=78731,us&APPID=e8d5eb59bc5c06cfefdf40bc624d280b&units=imperial HTTP/1.1\r\nUser-Agent: Keil\r\nHost:api.openweathermap.org\r\nAccept: */*\r\n\r\n"
 
 void packetParse(char* pkt){
 	char* temp = "\"temp\"";
@@ -159,9 +157,43 @@ int getConnected(char* SSID, int32_t encryption, char* password){
 }
 
 
-int sendRequest(void)
+int sendRequest(char* request)
 {
+	int32_t retVal;  SlSecParams_t secParams;
+  char *pConfig = NULL; INT32 ASize = 0; SlSockAddrIn_t  Addr;
+	
+    strcpy(HostName,"api.openweathermap.org");
+    retVal = sl_NetAppDnsGetHostByName(HostName,
+             strlen(HostName),&DestinationIP, SL_AF_INET);
+    if(retVal == 0){
+      Addr.sin_family = SL_AF_INET;
+      Addr.sin_port = sl_Htons(80);
+      Addr.sin_addr.s_addr = sl_Htonl(DestinationIP);// IP to big endian 
+      ASize = sizeof(SlSockAddrIn_t);
+      SockID = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
+      if( SockID >= 0 ){
+        retVal = sl_Connect(SockID, ( SlSockAddr_t *)&Addr, ASize);
+      }
+      if((SockID >= 0)&&(retVal >= 0)){
+        strcpy(SendBuff,request); 
+        sl_Send(SockID, SendBuff, strlen(SendBuff), 0);// Send the HTTP GET 
+        sl_Recv(SockID, Recvbuff, MAX_RECV_BUFF_SIZE, 0);// Receive response 
+        sl_Close(SockID);
+        LED_GreenOn();
+				ST7735_SetCursor(0,7);
+				
+				packetParse(Recvbuff);
+//				ST7735_OutString(Recvbuff);
+				ST7735_OutString("\n");
+				ST7735_sDecOut3(ADC0_InSeq1()*10000/1241);
+				ST7735_OutString(" Volts");
+			}
+				
+ //       UARTprintf("\r\n\r\n");
+ //       UARTprintf(Recvbuff);  UARTprintf("\r\n");
 	return 1;
+		}
+		return 0;
 }
 
 static int32_t configureSimpleLinkToDefaultState(char *pConfig){

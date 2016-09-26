@@ -17,4 +17,4 @@
 void packetParse(char* pkt);
 
 int getConnected(char* SSID, int32_t encryption, char* password);
-int sendRequest(void);
+int sendRequest(char* request);
