@@ -18,3 +18,4 @@ void packetParse(char* pkt);
 
 int getConnected(char* SSID, int32_t encryption, char* password);
 int sendRequest(char* request);
+void push_Request(char* request);

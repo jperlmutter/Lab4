@@ -4,6 +4,7 @@
 #include "ST7735.h"
 #include "wlan.h"
 #include "LED.h"
+#include "Timer1.h"
 
 #define MAX_RECV_BUFF_SIZE  1024
 #define MAX_SEND_BUFF_SIZE  512
@@ -194,6 +195,59 @@ int sendRequest(char* request)
 	return 1;
 		}
 		return 0;
+}
+#define push_REQUEST "GET /query?city=Austin%20Texas&id=Lei%20and%20Jacob&greet=<data>&edxcode=8086 HTTP/1.1\r\nUser-Agent: Keil\r\nHost: embedded-systems-server.appspot.com\r\n\r\n"
+
+const char *requirement_line1 = " HTTP/1.1\r\nUser-Agent: Keil\r\nHost:";
+const char *requirement_line2 = "\r\n\r\n";
+char Recvbuff_Send[MAX_RECV_BUFF_SIZE];
+char SendBuff_Send[MAX_SEND_BUFF_SIZE];
+char HostName_Send[MAX_HOSTNAME_SIZE];
+unsigned long DestinationIP_Send;
+int SockID_Send;
+
+void push_Request(char* request){
+/*	LED_GreenOn();
+	Timer1_StartWatch();
+//	sendRequest(push_REQUEST);
+	strcpy(HostName,"http://embedded-systems-server.appspot.com/");
+  int32_t retVal = sl_NetAppDnsGetHostByName(HostName,
+*/
+	int retVal;
+	char *pConfig = NULL;
+	INT32 ASize = 0; 
+	SlSockAddrIn_t  Addr;
+	strcpy(HostName_Send,"embedded-systems-server.appspot.com");
+	retVal = sl_NetAppDnsGetHostByName(HostName_Send,
+					 strlen(HostName_Send),&DestinationIP_Send, SL_AF_INET);
+	if(retVal == 0){
+		Addr.sin_family = SL_AF_INET;						//establishing connection
+		Addr.sin_port = sl_Htons(80);
+		Addr.sin_addr.s_addr = sl_Htonl(DestinationIP_Send);// IP to big endian 
+		ASize = sizeof(SlSockAddrIn_t);
+		SockID_Send = sl_Socket(SL_AF_INET,SL_SOCK_STREAM, 0);
+		if(SockID_Send >= 0){		//some data to read
+			retVal = sl_Connect(SockID_Send, ( SlSockAddr_t *)&Addr, ASize);
+		}
+		if((SockID >= 0)&&(retVal >= 0)){
+			uint32_t index = 0;
+			strcpy(&SendBuff[index], request); index += strlen(push_REQUEST);
+			strcpy(&SendBuff[index], ADC0_InSeq1()); index+=strlen(ADC0_InSeq1());
+			strcpy(&SendBuff[index], "V"); index+=strlen("V");
+			strcpy(&SendBuff[index], push_REQUEST); index += strlen(push_REQUEST);
+			SendBuff[index] = '\0';
+			
+			//send data to server
+			LED_GreenOn();
+			sl_Send(SockID_Send, SendBuff_Send, strlen(SendBuff_Send), 0);		// Sends the data to the http server
+			sl_Recv(SockID_Send, Recvbuff_Send, MAX_RECV_BUFF_SIZE, 0);				// should receive data after sending
+			sl_Close(SockID_Send);
+			LED_GreenOff();
+		}
+	ST7735_SetCursor(0,1);
+	ST7735_OutString(ADC0_InSeq1());
+	}
+	
 }
 
 static int32_t configureSimpleLinkToDefaultState(char *pConfig){
