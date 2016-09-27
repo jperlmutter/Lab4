@@ -2,9 +2,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "ST7735.h"
+#include "ADCSWTrigger.h"
 #include "wlan.h"
 #include "LED.h"
-#include "Timer1.h"
 
 #define MAX_RECV_BUFF_SIZE  1024
 #define MAX_SEND_BUFF_SIZE  512
@@ -116,23 +116,24 @@ void packetParse(char* pkt){
 	int counter = 0;
 	while(pkt[counter] != 0)
 	{
-		if(pkt[counter]=='t'  && pkt[counter+1]=='e' && pkt[counter+2]=='m' && pkt[counter+3]=='p' && pkt[counter+4]=='\"'  )
-		{
+		if(pkt[counter]=='t'  && pkt[counter+1]=='e' && pkt[counter+2]=='m' && pkt[counter+3]=='p' && pkt[counter+4]=='\"'  ){
 			tempnum[0] = pkt[counter+6];
 			tempnum[1] = pkt[counter+7];
 			tempnum[2] = pkt[counter+8];
 			tempnum[3] = pkt[counter+9];
 			tempnum[4] = pkt[counter+10];
 			tempnum[5] = 0;
+			
+			ST7735_SetCursor(0,7);
+			ST7735_OutString("Temp: ");
+			ST7735_OutString(tempnum);
+			ST7735_OutString(" F");
 		}
 		counter++;
 		
 	}
 	
-	ST7735_OutString("Temp: ");
 	
-	ST7735_OutString(tempnum);
-	ST7735_OutString(" F");
 	
 }
 int getConnected(char* SSID, int32_t encryption, char* password){
@@ -181,21 +182,18 @@ int sendRequest(char* request)
         sl_Recv(SockID, Recvbuff, MAX_RECV_BUFF_SIZE, 0);// Receive response 
         sl_Close(SockID);
         LED_GreenOn();
-				ST7735_SetCursor(0,7);
+
 				
 				packetParse(Recvbuff);
 //				ST7735_OutString(Recvbuff);
 				ST7735_OutString("\n");
-				ST7735_sDecOut3(ADC0_InSeq1()*10000/1241);
-				ST7735_OutString(" Volts");
-			}
-				
- //       UARTprintf("\r\n\r\n");
- //       UARTprintf(Recvbuff);  UARTprintf("\r\n");
-	return 1;
+
+				return 1;
+			}	
 		}
 		return 0;
 }
+
 #define push_REQUEST "GET /query?city=Austin%20Texas&id=Lei%20and%20Jacob&greet=<data>&edxcode=8086 HTTP/1.1\r\nUser-Agent: Keil\r\nHost: embedded-systems-server.appspot.com\r\n\r\n"
 
 const char *requirement_line1 = " HTTP/1.1\r\nUser-Agent: Keil\r\nHost:";
@@ -248,6 +246,9 @@ void push_Request(char* request){
 	}
 	
 }
+
+
+
 
 static int32_t configureSimpleLinkToDefaultState(char *pConfig){
   SlVersionFull   ver = {0};
