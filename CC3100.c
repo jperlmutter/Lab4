@@ -231,10 +231,9 @@ void push_Request(char* request){
 		}
 		if((SockID >= 0)&&(retVal >= 0)){
 			uint32_t index = 0;
-			strcpy(&SendBuff[index], request); index += strlen(push_REQUEST);
+			strcpy(&SendBuff[index], push_REQUEST); index += strlen(push_REQUEST);
 			strcpy(&SendBuff[index], ADC0_InSeq1()); index+=strlen(ADC0_InSeq1());
 			strcpy(&SendBuff[index], "V"); index+=strlen("V");
-			strcpy(&SendBuff[index], push_REQUEST); index += strlen(push_REQUEST);
 			SendBuff[index] = '\0';
 			
 			//send data to server
