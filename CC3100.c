@@ -232,7 +232,7 @@ void push_Request(char* request){
 		if((SockID >= 0)&&(retVal >= 0)){
 			uint32_t index = 0;
 			strcpy(&SendBuff[index], push_REQUEST); index += strlen(push_REQUEST);
-			strcpy(&SendBuff[index], ADC0_InSeq1()); index+=strlen(ADC0_InSeq1());
+			strcpy(&SendBuff[index], request); index+=strlen(request);
 			strcpy(&SendBuff[index], "V"); index+=strlen("V");
 			SendBuff[index] = '\0';
 			
@@ -244,7 +244,7 @@ void push_Request(char* request){
 			LED_GreenOff();
 		}
 	ST7735_SetCursor(0,1);
-	ST7735_OutString(ADC0_InSeq1());
+	ST7735_OutString(request);
 	}
 	
 }

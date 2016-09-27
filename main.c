@@ -134,6 +134,7 @@ int main(void){int32_t retVal;  SlSecParams_t secParams;
   
   while(1){
     sendRequest(REQUEST);
+		push_Request(ADC0_InSeq1());
     while(Board_Input()==0){}; // wait for touch
     LED_GreenOff();
   }
