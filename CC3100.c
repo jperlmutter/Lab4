@@ -5,6 +5,7 @@
 #include "ADCSWTrigger.h"
 #include "wlan.h"
 #include "LED.h"
+#include "Timer1.h"
 
 #define MAX_RECV_BUFF_SIZE  1024
 #define MAX_SEND_BUFF_SIZE  512
@@ -159,8 +160,8 @@ int getConnected(char* SSID, int32_t encryption, char* password){
 }
 
 
-int sendRequest(char* request)
-{
+int sendRequest(char* request){
+	//Timer1_StartWatch();
 	int32_t retVal;  SlSecParams_t secParams;
   char *pConfig = NULL; INT32 ASize = 0; SlSockAddrIn_t  Addr;
 	
@@ -177,17 +178,19 @@ int sendRequest(char* request)
         retVal = sl_Connect(SockID, ( SlSockAddr_t *)&Addr, ASize);
       }
       if((SockID >= 0)&&(retVal >= 0)){
+        LED_GreenOn();
         strcpy(SendBuff,request); 
         sl_Send(SockID, SendBuff, strlen(SendBuff), 0);// Send the HTTP GET 
         sl_Recv(SockID, Recvbuff, MAX_RECV_BUFF_SIZE, 0);// Receive response 
         sl_Close(SockID);
-        LED_GreenOn();
+				//LED_GreenOff();
 
-				
 				packetParse(Recvbuff);
 //				ST7735_OutString(Recvbuff);
 				ST7735_OutString("\n");
-
+				//uint32_t timer=Timer1_StopWatch();
+				//ST7735_SetCursor(0,2);
+				//ST7735_OutUDec(timer);
 				return 1;
 			}	
 		}
@@ -205,12 +208,7 @@ unsigned long DestinationIP_Send;
 int SockID_Send;
 
 void push_Request(char* request){
-/*	LED_GreenOn();
 	Timer1_StartWatch();
-//	sendRequest(push_REQUEST);
-	strcpy(HostName,"http://embedded-systems-server.appspot.com/");
-  int32_t retVal = sl_NetAppDnsGetHostByName(HostName,
-*/
 	int retVal;
 	char *pConfig = NULL;
 	INT32 ASize = 0; 
@@ -241,8 +239,11 @@ void push_Request(char* request){
 			sl_Close(SockID_Send);
 			LED_GreenOff();
 		}
+	uint32_t timer=Timer1_StopWatch();
 	ST7735_SetCursor(0,1);
 	ST7735_OutString(request);
+	ST7735_SetCursor(0,2);
+	ST7735_OutUDec(timer);
 	}
 	
 }

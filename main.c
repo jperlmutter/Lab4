@@ -96,6 +96,7 @@ Port A, SSI0 (PA2, PA3, PA5, PA6, PA7) sends data to Nokia5110 LCD
 #include "ST7735.h"
 #include "ADCSWTrigger.h"
 #include "CC3100.h"
+#include "Timer1.h"
 
 #include <string.h>
 #define SSID_NAME  "iPhone" /* Access point name to connect to */
@@ -119,6 +120,7 @@ int main(void){int32_t retVal;  SlSecParams_t secParams;
  
 	ST7735_InitR(INITR_REDTAB);
   LED_Init();       // initialize LaunchPad I/O 
+	Timer1_Init();
 	ADC0_InitSWTriggerSeq1_Ch9(); 
 	
 	ST7735_OutString("Weather App\n");
@@ -146,7 +148,10 @@ void ADCtoString(int adcval){
 	
 	int counter = 0;
 	while(magnitudeCTR>=1){
-		if(magnitudeCTR==1000){adc0val[counter] = '.'; counter++;}
+		if(magnitudeCTR==1000){
+			adc0val[counter] = '.';
+			counter++;
+		}
 		adc0val[counter] = output/magnitudeCTR + 48;
 		//Update
 		output%=magnitudeCTR;
